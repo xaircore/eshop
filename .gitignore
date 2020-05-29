@@ -1,3 +1,6 @@
+# Editors settings
+.idea
+
 *.gem
 *.rbc
 /.config
