@@ -11,23 +11,25 @@ class SearchQuery
   DIGITAL_VERSION = '(digital_version_b:\"true\")'.freeze
   RETAIL_VERSION = '(physical_version_b:\"true\")'.freeze
 
-  private_constant :OFF_SALE_SORTING
+  private_constant :ON_SALE_SORTING
   private_constant :OFF_SALE_SORTING
   private_constant :FULL_QUERY
   private_constant :AND_SEPARATOR
   private_constant :GAME_TYPE
-  private_constant :DIGITAL_VERSION
+  private_constant :ON_SALE
   private_constant :DEMO_AVAILABLE
   private_constant :DLC_AVAILABLE
+  private_constant :DIGITAL_VERSION
+  private_constant :RETAIL_VERSION
 
-  attr_reader :query, :offset, :limit, :platforms, :media_types, :genres, :languages, :on_sale, :demo_available, :dlc_available
+  attr_reader :query, :offset, :limit, :platforms, :media_type, :genres, :languages, :on_sale, :demo_available, :dlc_available
 
   def initialize
-    @query = ""
+    @query = FULL_QUERY
     @offset = 0
     @limit = 24
     @platforms = []
-    @media_types = []
+    @media_type = nil
     @genres = []
     @languages = []
     @on_sale = false
@@ -35,52 +37,57 @@ class SearchQuery
     @dlc_available = false
   end
 
-  def add_query(query)
+  def with_query(query)
     @query = query
   end
 
-  def add_offset(offset)
+  def with_offset(offset)
     @offset = offset
     self
   end
 
-  def add_limit(limit)
+  def with_limit(limit)
     @limit = limit
     self
   end
 
-  def add_platform(platform)
+  def with_platform(platform)
     @platforms.push platform
     self
   end
 
-  def add_media_type(media_type)
-    @media_types.push media_type
+  def with_media_type(media_type)
+    @media_type = media_type
     self
   end
 
-  def add_genre(genre)
+  def with_genre(genre)
     @genres.push genre
     self
   end
 
-  def add_language(language)
+  def with_language(language)
     @languages.push language
     self
   end
 
-  def add_on_sale
+  def with_on_sale
     @on_sale = true
     self
   end
 
-  def add_demo_available
+  def reset_on_sale
+    @on_sale = false
+    self
+  end
+
+  def with_demo_available
     @demo_available = true
     @dlc_available = false
     self
   end
 
-  def add_dlc_available
+  def with_dlc_available
     @dlc_available = true
     @demo_available = false
     self
@@ -88,7 +95,7 @@ class SearchQuery
 
   def to_hash
     {
-        :q => @query.empty? ? FULL_QUERY : @query,
+        :q => @query,
         :fq => (get_fetch_query.join AND_SEPARATOR),
         :start => @offset,
         :rows => @limit,
@@ -122,7 +129,7 @@ class SearchQuery
     ""
   end
 
-  def get_media_types_query
+  def get_media_type_query
     ""
   end
 end
